@@ -921,6 +921,10 @@ class smb(connection):
         for dc in self.db.get_domain_controllers(domain=self.domain):
             dc_ips.append(dc[1])
         if not dc_ips:
+            # TODO: Implement a better way to get a DC
+            if self.kdcHost is not None:
+                dc_ips.append(self.kdcHost)
+
             dc_ips.append(self.host)
         return dc_ips
 
@@ -955,6 +959,7 @@ class smb(connection):
                 self.password,
                 self.lmhash,
                 self.nthash,
+                do_kerberos=self.kerberos,
             )
             self.logger.display("Enumerated disks")
             for disk in disks:
@@ -1003,7 +1008,7 @@ class smb(connection):
                                 member_count_ad=group.membercount,
                             )[0]
                         else:
-                            domain, name = group.name.split("/")
+                            domain, name = group.name.split("\\")
                             self.logger.highlight(f"domain: {domain}, name: {name}")
                             self.logger.highlight(f"{domain.upper()}\\{name}")
                             try:
@@ -1179,9 +1184,12 @@ class smb(connection):
                 )
 
                 self.logger.success("Enumerated domain computer(s)")
-                for hosts in hosts:
-                    domain, host_clean = self.domainfromdnshostname(hosts.dnshostname)
-                    self.logger.highlight(f"{domain}\\{host_clean:<30}")
+                for host in hosts:
+                    try:
+                        domain, host_clean = self.domainfromdnshostname(host.dnshostname)
+                        self.logger.highlight(f"{domain}\\{host_clean:<30}")
+                    except:
+                        self.logger.highlight(f"{host.samaccountname}")
                 break
             except Exception as e:
                 self.logger.fail(f"Error enumerating domain hosts using dc ip {dc_ip}: {e}")
@@ -1228,6 +1236,7 @@ class smb(connection):
                 self.password,
                 self.lmhash,
                 self.nthash,
+                do_kerberos=self.kerberos,
             )
             rpc._create_wmi_connection(namespace=namespace)
 

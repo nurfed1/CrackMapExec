@@ -1159,7 +1159,7 @@ class smb(connection):
         users = UserSamrDump(self).dump()
         return users
 
-    def hosts(self):
+    def computers(self):
         hosts = []
         for dc_ip in self.get_dc_ips():
             try:

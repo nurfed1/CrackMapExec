@@ -936,9 +936,11 @@ class smb(connection):
                 do_kerberos=self.kerberos,
             )
             self.logger.display("Enumerated sessions")
-            for session in sessions:
-                if session.sesi10_cname.find(self.local_ip) == -1:
-                    self.logger.highlight(f"{session.sesi10_cname:<25} User:{session.sesi10_username}")
+
+            unique_sessions = set([(s.sesi10_cname, s.sesi10_username ) for s in sessions])
+            for session in unique_sessions:
+                if session[0] != f"\\\\{self.local_ip}":
+                    self.logger.highlight(f"{session[0]:<25} User:{session[1]}")
             return sessions
         except:
             pass

@@ -933,6 +933,7 @@ class smb(connection):
                 self.password,
                 self.lmhash,
                 self.nthash,
+                do_kerberos=self.kerberos,
             )
             self.logger.display("Enumerated sessions")
             for session in sessions:
@@ -982,6 +983,7 @@ class smb(connection):
                     queried_groupname=self.args.local_groups,
                     list_groups=True if not self.args.local_groups else False,
                     recurse=False,
+                    do_kerberos=self.kerberos,
                 )
 
                 if self.args.local_groups:
@@ -1075,6 +1077,7 @@ class smb(connection):
                         use_matching_rule=False,
                         full_data=False,
                         custom_filter=str(),
+                        do_kerberos=self.kerberos,
                     )
 
                     self.logger.success("Enumerated members of domain group")
@@ -1129,6 +1132,7 @@ class smb(connection):
                         admin_count=False,
                         full_data=True,
                         custom_filter=str(),
+                        do_kerberos=self.kerberos,
                     )
 
                     self.logger.success("Enumerated domain group(s)")
@@ -1169,6 +1173,7 @@ class smb(connection):
                     queried_domain="",
                     ads_path=str(),
                     custom_filter=str(),
+                    do_kerberos=self.kerberos,
                 )
 
                 self.logger.success("Enumerated domain computer(s)")
@@ -1191,6 +1196,7 @@ class smb(connection):
                 self.password,
                 lmhash=self.lmhash,
                 nthash=self.nthash,
+                do_kerberos=self.kerberos,
             )
             self.logger.success("Enumerated logged_on users")
             if self.args.loggedon_users_filter:
